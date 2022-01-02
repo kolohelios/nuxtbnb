@@ -23,7 +23,7 @@ export default {
                 {
                     src: 'https://maps.googleapis.com/maps/api/js?key=<GoogleMapsKey>&libraries=places&callback=initMap',
                     hid: 'map',
-                    defer: true,
+                    async: true,
                     skip: process.client && window.mapLoaded,
                 },
                 {
@@ -42,17 +42,27 @@ export default {
         const home = homes.find(home => home.objectID == this.$route.params.id)
         this.home = home
     },
-    mounted() {
-        const mapOptions = {
-            zoom: 18,
-            center: new window.google.maps.LatLng(this.home._geoloc.lat, this.home._geoloc.lng),
-            disableDefaultUI: true,
-            zoomControl: true,
+    methods: {
+        showMap() {
+                const mapOptions = {
+                zoom: 18,
+                center: new window.google.maps.LatLng(this.home._geoloc.lat, this.home._geoloc.lng),
+                disableDefaultUI: true,
+                zoomControl: true,
+            }
+            const map = new window.google.maps.Map(this.$refs.map, mapOptions)
+            const position = new window.google.maps.LatLng(this.home._geoloc.lat, this.home._geoloc.lng)
+            const marker = new window.google.maps.Marker({ position })
+            marker.setMap(map)
         }
-        const map = new window.google.maps.Map(this.$refs.map, mapOptions)
-        const position = new window.google.maps.LatLng(this.home._geoloc.lat, this.home._geoloc.lng)
-        const marker = new window.google.maps.Marker({ position })
-        marker.setMap(map)
-}
+    },
+    mounted() {
+        const timer = setInterval(() => {
+            if (window.mapLoaded) {
+                clearInterval(timer)
+                this.showMap()
+            }
+        }, 200)
+    }
 }
 </script>
