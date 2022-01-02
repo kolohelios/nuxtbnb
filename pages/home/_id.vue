@@ -14,15 +14,25 @@
 </template>
 <script>
 import homes from '~/data/homes'
+
+if (process.client) {
+    window.initMap = function() {
+        console.log('test')
+    }
+}
+
 export default {
     head() {
         return {
             title: this.home.title,
             script: [
                 {
-                    src: 'https://maps.googleapis.com/maps/api/js?key=<GoogleMapsAPIKey>&libraries=places',
+                    src: 'https://maps.googleapis.com/maps/api/js?key=<GoogleMapsAPIKey></GoogleMapsAPIKey>&libraries=places&callback=initMap',
                     hid: 'map',
                     defer: true,
+                },
+                {
+
                 }
             ]
         }
