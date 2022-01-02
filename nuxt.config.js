@@ -16,11 +16,7 @@ export default {
         prefetchLinks: false
     },
     plugins: [
-        // commented-out object form followed by simple string form
-        // {
-        //     src: '~/plugins/maps.client',
-        //     mode: 'client' // don't need this since the string include src string include "client"
-        // }
         '~/plugins/maps.client',
+        '~/plugins/dataApi'
     ]
 }
