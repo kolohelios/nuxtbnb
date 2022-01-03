@@ -13,8 +13,8 @@
     <div v-for="review in reviews" :key="review.objectID">
         <img :src="review.reviewer.image"/><br/>
         <div>{{ review.reviewer.name }}</div>
-        <div>{{ review.date }}</div>
-        <div>{{ review.comment }}</div>
+        <div>{{ formatDate(review.date) }}</div>
+        <short-text :text="review.comment" :target="150"/><br/>
     </div>
 </div>
 </template>
@@ -39,6 +39,12 @@ export default {
     },
     mounted() {
         this.$maps.showMap(this.$refs.map, this.home._geoloc.lat, this.home._geoloc.lng)
+    },
+    methods: {
+        formatDate(dateStr) {
+            const date = new Date(dateStr)
+            return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+        }
     }
 }
 </script>
