@@ -10,6 +10,12 @@
     <div>{{ home.guests }} guests, {{ home.bedrooms }} rooms, {{ home.beds }} beds, {{ home.bathrooms }} bathrooms</div>
     <div>{{ home.description }}</div>
     <div style="height:800px;width:800px" ref="map"></div>
+    <div v-for="review in reviews" :key="review.objectID">
+        <img :src="review.reviewer.image"/><br/>
+        <div>{{ review.reviewer.name }}</div>
+        <div>{{ review.date }}</div>
+        <div>{{ review.comment }}</div>
+    </div>
 </div>
 </template>
 <script>
@@ -20,9 +26,16 @@ export default {
         }
     },
     async asyncData({ params, $dataApi, error }) {
-        const response = await $dataApi.getHome(params.id)
-        if (!response.ok) { return error({ statusCode: response.status, message: response.statusText })}
-        return { home: response.json }
+        const homeResponse = await $dataApi.getHome(params.id)
+        if (!homeResponse.ok) { return error({ statusCode: homeResponse.status, message: homeResponse.statusText })}
+
+        const reviewResponse = await $dataApi.getReviewsByHomeId(params.id)
+        if (!reviewResponse.ok) { return error({ statusCode: reviewResponse.status, message: reviewResponse.statusText })}
+
+        return {
+            home: homeResponse.json,
+            reviews: reviewResponse.json.hits,
+        }
     },
     mounted() {
         this.$maps.showMap(this.$refs.map, this.home._geoloc.lat, this.home._geoloc.lng)
