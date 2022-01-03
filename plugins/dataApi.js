@@ -2,19 +2,46 @@ export default function(context, inject) {
     const appId = '99FRVD479B'
     const apiKey = '4f3fb7137aaaa71dcac82a9c0df893d2'
 
+    const headers = {
+        'X-Algolia-API-Key': apiKey,
+        'X-Algolia-Application-Id': appId,
+    }
+
     inject('dataApi', {
         getHome
     })
 
     async function getHome(homeId) {
-        console.log({ homeId })
-        const response = await fetch(`https://${appId}-dsn.algolia.net/1/indexes/homes/${homeId}`, {
-            headers: {
-                'X-Algolia-API-Key': apiKey,
-                'X-Algolia-Application-Id': appId,
-            }
-        })
+        // two levels of errors to handle:
+        // unexpected response
+        // no response at all (DNS error, connectivity issue)
+        try {
+            return unWrap(await fetch(
+                `https://${appId}-dsn.algolia.net/1/indexes/homes/${homeId}`,
+                { headers }
+            ))
+        } catch (error) {
+            return getErrorResponse(error)
+        }
+    }
+
+    async function unWrap(response) {
         const json = await response.json()
-        return json
+        const { ok, status, statusText } = response
+        return {
+            json,
+            ok,
+            status,
+            statusText,
+        }
+    }
+
+    function getErrorResponse(error) {
+        return {
+            ok: false,
+            status: 500,
+            statusText: error.message,
+            json: {}
+        }
     }
 }
